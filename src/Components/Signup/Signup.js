@@ -14,23 +14,66 @@ export default function Signup() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [nameError, setNameError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate()
   const { firebase } = useContext(FirebaseContext)
   const auth = getAuth(firebase)
   const db = getFirestore(firebase);
 
+ 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+
   const handleSignUp = async function(e) {
 
     e.preventDefault()
+
+    let isValid = true;
+
+    if (name.trim() === '') {
+      setNameError('Username is required.');
+      isValid = false;
+    } else {
+      setNameError('');
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address.');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    if (phoneNumber.trim().length !== 10) {
+      setPhoneError('Phone number must be 10 digits.');
+      isValid = false;
+    } else {
+      setPhoneError('');
+    }
+
+    if (password.trim().length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
   
-    createUserWithEmailAndPassword(auth, email, password)
+    if (isValid) {
+      createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
 
         updateProfile(result.user, {
           displayName: name,
         }).then(() => {
           
-            setDoc(doc(db, 'users', result.user.uid), {
+          setDoc(doc(db, 'users', result.user.uid), {
+            id:result.user.uid,
             name: name,
             phoneNumber: phoneNumber
             }).then(() => {
@@ -46,16 +89,20 @@ export default function Signup() {
         console.error('Error signing up:', error);
       });
     
+    }
+ 
   }
 
 
   return (
     <div>
       <div className="signupParentDiv">
-        <img width="200px" height="200px" src={Logo} alt='banner'></img>
+        <div className="logo">
+        <img width="160px" height="160px" src={Logo} alt='banner'></img>
+        </div>
         <form >
-          <label htmlFor="fname">Username</label>
-          <br />
+          <div className="inputDiv">
+          <label htmlFor="fname">Username</label>    
           <input
             className="input"
             type="text"
@@ -65,10 +112,12 @@ export default function Signup() {
             value={name}
             onChange={(e) => setName(e.target.value)
             }
-          />
-          <br />
+            />
+             {nameError && <div className="error">{nameError}</div>}
+          </div>
+      
+          <div className="inputDiv">
           <label htmlFor="fname">Email</label>
-          <br />
           <input
             className="input"
             type="email"
@@ -78,10 +127,12 @@ export default function Signup() {
             value={email}
             onChange={(e) => setEmail(e.target.value)
             }
-          />
-          <br />
-          <label htmlFor="lname">Phone</label>
-          <br />
+            />
+             {emailError && <div className="error">{emailError}</div>}
+          </div>
+          
+          <div className="inputDiv">
+            <label htmlFor="lname">Phone</label> 
           <input
             className="input"
             type="number"
@@ -91,10 +142,12 @@ export default function Signup() {
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)
             }
-          />
-          <br />
+            />
+             {phoneError && <div className="error">{phoneError}</div>}
+        </div>
+    
+          <div className="inputDiv">
           <label htmlFor="lname">Password</label>
-          <br />
           <input
             className="input"
             type="password"
@@ -104,12 +157,15 @@ export default function Signup() {
             value={password}
             onChange={(e) => setPassword(e.target.value)
             }
-          />
-          <br />
-          <br />
-          <button onClick={handleSignUp}>Signup</button>
+            />
+             {passwordError && <div className="error">{passwordError}</div>}
+          </div>
+          <div className="buttonDiv">
+             <button onClick={handleSignUp}>Signup</button>
+          </div>
         </form>
-        <a>Login</a>
+        <br />
+        <div className='login' onClick={(e)=>navigate('/login')}>Login</div>
       </div>
     </div>
   );

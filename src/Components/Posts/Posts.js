@@ -1,9 +1,35 @@
-import React from 'react';
-
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FirebaseContext } from '../../Store/FirebaseContext';
+import { PostContext } from '../../Store/PostContext';
+import { collection, getDocs ,getFirestore} from "firebase/firestore";
 import Heart from '../../assets/Heart';
 import './Post.css';
 
 function Posts() {
+ 
+  const [products,setProducts] = useState([])
+  const { firebase } = useContext(FirebaseContext)
+  const { setPostDetails } = useContext(PostContext)
+  const navigate = useNavigate()
+  const db = getFirestore(firebase)
+  
+  useEffect(() => {
+
+    getDocs(collection(db, "products"))
+      .then(snapshot => {
+        const productsList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProducts(productsList);
+      })
+      .catch(error => {
+        console.error("Error fetching products:", error); 
+      });
+    
+
+},[])
 
   return (
     <div className="postParentDiv">
@@ -13,24 +39,35 @@ function Posts() {
           <span>View more</span>
         </div>
         <div className="cards">
-          <div
-            className="card"
+         
+          {products.map((product) => {
+            return  <div
+              className="card"
+              onClick={() => { 
+
+                setPostDetails(product)
+                navigate('/view')
+
+              }}
           >
             <div className="favorite">
               <Heart></Heart>
             </div>
             <div className="image">
-              <img src="../../../Images/R15V3.jpg" alt="" />
+              <img src={product.url} alt="" />
             </div>
             <div className="content">
-              <p className="rate">&#x20B9; 250000</p>
-              <span className="kilometer">Two Wheeler</span>
-              <p className="name"> YAMAHA R15V3</p>
+                <p className="rate">&#x20B9; { product.price}</p>
+                <span className="kilometer">{ product.category}</span>
+                <p className="name"> { product.name}</p>
             </div>
             <div className="date">
-              <span>Tue May 04 2021</span>
+                <span>{ product.createdAt}</span>
             </div>
           </div>
+          })}
+          
+
         </div>
       </div>
       <div className="recommendations">
@@ -38,22 +75,27 @@ function Posts() {
           <span>Fresh recommendations</span>
         </div>
         <div className="cards">
-          <div className="card">
-            <div className="favorite">
-              <Heart></Heart>
+          {products.slice(0,6).map((product) => {
+            return <div className="card" onClick={() => {
+              setPostDetails(product)
+              navigate('/view')
+            }}>
+              <div className="favorite">
+                <Heart></Heart>
+              </div>
+              <div className="image">
+                <img src={product.url} alt="" />
+              </div>
+              <div className="content">
+                <p className="rate">&#x20B9; { product.price}</p>
+                <span className="kilometer">{product.category }</span>
+                <p className="name"> { product.name}</p>
+              </div>
+              <div className="date">
+                <span>{ product.createdAt}</span>
+              </div>
             </div>
-            <div className="image">
-              <img src="../../../Images/R15V3.jpg" alt="" />
-            </div>
-            <div className="content">
-              <p className="rate">&#x20B9; 250000</p>
-              <span className="kilometer">Two Wheeler</span>
-              <p className="name"> YAMAHA R15V3</p>
-            </div>
-            <div className="date">
-              <span>10/5/2021</span>
-            </div>
-          </div>
+          })}
         </div>
       </div>
     </div>

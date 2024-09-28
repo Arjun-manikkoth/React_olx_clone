@@ -9,30 +9,60 @@ function Login() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [accountError,setAccountError] = useState('')
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { firebase } = useContext(FirebaseContext)
   const auth = getAuth(firebase);
   const navigate = useNavigate()
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault()
-  
-    signInWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        console.log('Logged in:', result.user);
-        navigate('/home'); 
-      })
-      .catch((error) => {
-        console.error('Login error:', error);
-    
-      });
+
+
+    let isValid = true;
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address.');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    if (password.trim().length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+
+    if (isValid) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((result) => {
+          navigate('/home');
+        })
+        .catch((error) => {
+              setAccountError(error.message);
+        });
+    }
 }
 
   return (
     <div>
       <div className="loginParentDiv">
-        <img width="200px" height="200px" src={Logo} alt='icon-img'></img>
+        <div className="logo">
+        <img width="160px"  height="160px" src={Logo} alt='icon-img'></img>
+        </div>
+        {accountError && <div className="error-msg">{accountError}</div>}
         <form onSubmit={handleFormSubmit}>
+          <div className='inputDiv'>
           <label htmlFor="fname">Email</label>
-          <br />
           <input
             className="input"
             type="email"
@@ -43,10 +73,11 @@ function Login() {
             onChange={(e) => {
               return setEmail(e.target.value)
             }}
-          />
-          <br />
+            />
+            {emailError && <div className="error">{emailError}</div>}
+          </div>
+          <div className="inputDiv">
           <label htmlFor="lname">Password</label>
-          <br />
           <input
             className="input"
             type="password"
@@ -57,12 +88,14 @@ function Login() {
             onChange={(e) => {
               return setPassword(e.target.value)
             }}
-          />
-          <br />
-          <br />
+            />
+            {passwordError && <div className="error">{passwordError}</div>}
+          </div>
+          <div className='buttonDiv'></div>
           <button>Login</button>
         </form>
-        <a>Signup</a>
+        <br />
+        <div className='signUp' onClick={(e)=>navigate('/signup')}>Create Your Free Account?</div>
       </div>
     </div>
   );

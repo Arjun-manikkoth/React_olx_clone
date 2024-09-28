@@ -52,15 +52,15 @@ function Header() {
           <span> ENGLISH </span>
           <Arrow></Arrow>
         </div>
-        <div className="loginPage">
-          <span>{ user? "Hi, " + user.displayName:'Login'}</span>
+        <div className="loginPage" onClick={!user?(e)=>{navigate('/login')}:null}>
+          <span >{ user? "Hi, " + user.displayName:'Login'}</span>
           <hr />    
         </div>
         { user? <span onClick={handleSignOut}>Logout</span>:''}
 
         <div className="sellMenu">
           <SellButton></SellButton>
-          <div className="sellMenuContent">
+          <div className="sellMenuContent" onClick={user?()=>{navigate('/create')}:()=>{navigate('/login')}}>
             <SellButtonPlus></SellButtonPlus>
             <span>SELL</span>
           </div>

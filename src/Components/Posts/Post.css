@@ -1,6 +1,6 @@
 .moreView {
-  margin: 16px 16px 24px;
-  padding: 16px 16px 32px;
+  margin: 16px 16px 20px;
+  padding: 16px 16px 0px;
   background-color: #ebeeef;
   border-radius: 4px;
 }
@@ -29,14 +29,16 @@
   white-space: nowrap;
   overflow-x: scroll;
   overflow-y: hidden;
+  margin-top: 20px;
 }
 
 .card {
   margin-right: 15px;
   padding: 13px;
+  margin-bottom: 15px;
   max-width: 222px;
-  width: 222px;
-  height: 270px;
+  width: 232px;
+  height: 285px;
   display: inline-block;
   cursor: pointer;
 }
@@ -78,9 +80,13 @@
 }
 
 .recommendations {
-  margin: 16px 16px 24px;
+  margin: 16px 26px 24px 26px;
+  margin-top: 40px;
+  padding-bottom: 45px;
 }
-
+.recommendations .heading{
+  padding-bottom: 23px;
+}
 .recommendations .heading span {
   font-size: 24px;
   color: #002f34;
